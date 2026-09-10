@@ -1,0 +1,17 @@
+.github/workflows/build-apk.yml
+README.md
+android/app/build.gradle
+android/app/proguard-rules.pro
+android/app/src/main/AndroidManifest.xml
+android/app/src/main/assets/index.html
+android/app/src/main/java/com/lineagrafica/finanzas/MainActivity.java
+android/app/src/main/res/drawable/app_icon.xml
+android/app/src/main/res/values/colors.xml
+android/app/src/main/res/values/styles.xml
+android/build.gradle
+android/gradle.properties
+android/settings.gradle
+supabase/config.toml
+supabase/functions/rates/index.ts
+supabase/migrations/20260910_finance_shared.sql
+web/index.html
