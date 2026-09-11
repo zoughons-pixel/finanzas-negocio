@@ -32,12 +32,18 @@ jobs:
       - name: Rebuild packaged frontend
         run: cat android/app/src/main/assets/html_*.b64 | base64 --decode > android/app/src/main/assets/index.html
 
-      - name: Build debug APK
+      - name: Build APKs
         working-directory: android
-        run: gradle assembleDebug --stacktrace
+        run: gradle assembleDebug assembleRelease --stacktrace
 
-      - name: Upload APK
+      - name: Upload unsigned release APK
         uses: actions/upload-artifact@v4
         with:
-          name: FinanzasNegocio-debug
+          name: E-conomic-release-unsigned
+          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: E-conomic-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
