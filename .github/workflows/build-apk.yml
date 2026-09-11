@@ -80,7 +80,7 @@ jobs:
           SHA256=$(sha256sum "$SIGNED" | awk '{print $1}')
           NOTES=$(git log -1 --pretty=%s)
           ENCODED_NOTES=$(python3 -c 'import sys,urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$NOTES")
-          curl -fsS -X POST \
+          curl --fail-with-body -sS -X POST \
             -H "Authorization: Bearer ${OIDC_TOKEN}" \
             -H "Content-Type: application/vnd.android.package-archive" \
             -H "X-APK-SHA256: ${SHA256}" \
