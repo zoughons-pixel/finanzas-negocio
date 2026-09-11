@@ -5,6 +5,10 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,18 +36,61 @@ jobs:
       - name: Rebuild packaged frontend
         run: cat android/app/src/main/assets/html_*.b64 | base64 --decode > android/app/src/main/assets/index.html
 
-      - name: Build APKs
+      - name: Build release APK
         working-directory: android
-        run: gradle assembleDebug assembleRelease --stacktrace
+        run: gradle assembleRelease --stacktrace
 
-      - name: Upload unsigned release APK
+      - name: Sign APK with permanent key
+        shell: bash
+        env:
+          ECONOMIC_KEYSTORE_B64: ${{ secrets.ECONOMIC_KEYSTORE_B64 }}
+          ECONOMIC_KEYSTORE_PASSWORD: ${{ secrets.ECONOMIC_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$ECONOMIC_KEYSTORE_B64"
+          test -n "$ECONOMIC_KEYSTORE_PASSWORD"
+          printf '%s' "$ECONOMIC_KEYSTORE_B64" | base64 --decode > /tmp/economic-release.jks
+          UNSIGNED="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          ALIGNED="android/app/build/outputs/apk/release/E-conomic-aligned.apk"
+          SIGNED="android/app/build/outputs/apk/release/E-conomic.apk"
+          "$ANDROID_HOME/build-tools/36.0.0/zipalign" -f -p 4 "$UNSIGNED" "$ALIGNED"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" sign \
+            --ks /tmp/economic-release.jks \
+            --ks-key-alias economic \
+            --ks-pass "pass:$ECONOMIC_KEYSTORE_PASSWORD" \
+            --key-pass "pass:$ECONOMIC_KEYSTORE_PASSWORD" \
+            --out "$SIGNED" "$ALIGNED"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$SIGNED"
+
+      - name: Request GitHub OIDC token
+        shell: bash
+        run: |
+          set -euo pipefail
+          OIDC_TOKEN=$(curl -fsS -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=supabase-economic-build" | jq -r '.value')
+          echo "::add-mask::$OIDC_TOKEN"
+          echo "OIDC_TOKEN=$OIDC_TOKEN" >> "$GITHUB_ENV"
+
+      - name: Publish signed APK to E-conomic updater
+        shell: bash
+        run: |
+          set -euo pipefail
+          SIGNED="android/app/build/outputs/apk/release/E-conomic.apk"
+          VERSION_CODE=$(grep -E "^[[:space:]]*versionCode[[:space:]]+[0-9]+" android/app/build.gradle | head -1 | grep -oE '[0-9]+')
+          VERSION_NAME=$(grep -E "^[[:space:]]*versionName[[:space:]]+'[^']+'" android/app/build.gradle | head -1 | sed -E "s/.*'([^']+)'.*/\1/")
+          SHA256=$(sha256sum "$SIGNED" | awk '{print $1}')
+          NOTES=$(git log -1 --pretty=%s)
+          ENCODED_NOTES=$(python3 -c 'import sys,urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$NOTES")
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${OIDC_TOKEN}" \
+            -H "Content-Type: application/vnd.android.package-archive" \
+            -H "X-APK-SHA256: ${SHA256}" \
+            --data-binary "@$SIGNED" \
+            "https://chfrcfaldbdhmtgtoxcm.supabase.co/functions/v1/build-signing?action=publish&version_code=${VERSION_CODE}&version=${VERSION_NAME}&mandatory=false&notes=${ENCODED_NOTES}" \
+            | tee /tmp/publish.json
+          test "$(jq -r '.ok' /tmp/publish.json)" = "true"
+
+      - name: Upload signed APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: E-conomic-release-unsigned
-          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
-
-      - name: Upload debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: E-conomic-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: E-conomic-signed
+          path: android/app/build/outputs/apk/release/E-conomic.apk
