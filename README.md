@@ -17,13 +17,14 @@ Cada movimiento conserva `bcv_rate` y `airtm_rate`, por lo que el histórico no 
 - El código SQL limita cada negocio a **máximo 2 usuarios**.
 - La Publishable Key se puede usar en la app porque RLS limita los datos.
 - **Nunca pongas una Secret Key / Service Role Key en el APK.**
+- Las actualizaciones OTA se validan mediante SHA-256 antes de activarse.
 
 ## 1. Preparar Supabase
 1. Crea o abre un proyecto Supabase.
-2. En SQL Editor ejecuta `supabase/migrations/20260910_finance_shared.sql`.
+2. Ejecuta la migración financiera y `supabase/migrations/20260911_ota_frontend_releases.sql`.
 3. Despliega `supabase/functions/rates/index.ts` como Edge Function llamada `rates`.
-4. Mantén `verify_jwt = true` (incluido en `supabase/config.toml`).
-5. Copia el **Project URL** y la **Publishable Key** desde Settings > API Keys.
+4. Mantén `verify_jwt = true` para `rates`.
+5. Usa el **Project URL** y la **Publishable Key** en el cliente Android/web.
 
 ## 2. Primer arranque en cada teléfono
 La app pide Project URL + Publishable Key una sola vez y las guarda localmente en ese dispositivo.
@@ -38,28 +39,43 @@ Si Supabase tiene activada la confirmación de email, cada usuario deberá confi
 
 ## 3. Tasas
 La Edge Function consulta:
-- BCV: `https://bcv.today/api/v1/rate.json` (replica datos publicados por bcv.org.ve).
-- Airtm: conversor oficial `VES -> USD/USDC` y extrae su **Net rate**.
+- BCV: `https://bcv.today/api/v1/rate.json`.
+- Airtm: `https://rates.airtm.io/`, usando `ves/usd.addValue` para estimar cuántos VES cuesta adquirir 1 USD/USDC en Airtm.
 
 La app consulta la función cada 60 segundos mientras está abierta.
 
-## 4. Proyecto Android
-El wrapper Android está en `android/`. Es una app WebView nativa que carga el frontend empaquetado localmente y usa Internet únicamente para Supabase, Realtime, BCV/Airtm y la librería JS de Supabase.
+## 4. Actualizaciones OTA del frontend
+Desde Android 1.1.0, la aplicación consulta `public.app_releases` al arrancar.
+
+Funcionamiento:
+1. Busca la versión activa con mayor `version_code`.
+2. Descarga el HTML desde Supabase.
+3. Comprueba su SHA-256.
+4. Guarda la versión válida en almacenamiento interno.
+5. Si Supabase o Internet fallan, utiliza la última versión OTA verificada o el frontend incluido en el APK.
+
+Por tanto, cambios de HTML, CSS y JavaScript se pueden distribuir sin reinstalar la APK. Solo los cambios nativos de Android (Java/Kotlin, permisos, SDK, icono nativo, etc.) requieren una nueva compilación.
+
+La tabla `app_releases` permite lectura únicamente de versiones activas a `anon` y `authenticated`; no concede permisos de escritura al cliente.
+
+## 5. Proyecto Android
+El wrapper Android está en `android/`. Es una app WebView nativa con frontend local de emergencia y soporte OTA mediante Supabase.
 
 Configuración actual:
 - Application ID: `com.lineagrafica.finanzas`
+- Android app: `1.1.0` (`versionCode 2`)
 - minSdk: 24
 - targetSdk / compileSdk: 36
 - AGP: 9.4.0
 - Gradle: 9.6.0
 - Java: 17
 
-## 5. Generar APK
+## 6. Generar APK
 ### Android Studio
 Abre la carpeta `android/`, deja que Android Studio instale SDK/Gradle y usa **Build > Build APK(s)**.
 
 ### GitHub Actions
-El archivo `.github/workflows/build-apk.yml` compila automáticamente `app-debug.apk`. Sube el proyecto a un repositorio, abre Actions > Build Android APK > Run workflow y descarga el artefacto.
+El archivo `.github/workflows/build-apk.yml` compila automáticamente `app-debug.apk` y lo publica como artefacto del workflow.
 
-## Nota sobre el APK incluido
-Este paquete contiene el proyecto Android listo para compilar. Si no existe `FinanzasNegocio.apk` en la raíz, significa que el entorno donde se generó el proyecto no tenía Android SDK/Gradle disponibles para producir el binario; no afecta al código fuente.
+## Nota de firma Android
+Para actualizaciones nativas instalables encima de una APK anterior, ambas APK deben estar firmadas con la misma clave. Los builds `debug` generados en runners efímeros pueden no conservar la misma firma entre ejecuciones. Para una distribución nativa estable conviene configurar una clave de firma persistente mediante secretos de CI o una pista privada de Google Play.
