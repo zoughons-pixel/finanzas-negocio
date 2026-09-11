@@ -82,7 +82,17 @@ public class MainActivity extends Activity {
         } catch (Exception ignored) {
             // Sin Internet o Supabase temporalmente no disponible: usar última versión válida.
         }
-        return current;
+        return injectDefaultSupabaseConfig(current);
+    }
+
+    private String injectDefaultSupabaseConfig(String html) {
+        String script = "<script>(function(){try{if(!localStorage.getItem('finance_supabase_cfg_v1')){"
+                + "localStorage.setItem('finance_supabase_cfg_v1',JSON.stringify({url:'"
+                + SUPABASE_URL + "',key:'" + SUPABASE_PUBLISHABLE_KEY
+                + "'}));}}catch(e){}})();</script>";
+        int headEnd = html.indexOf("</head>");
+        if (headEnd >= 0) return html.substring(0, headEnd) + script + html.substring(headEnd);
+        return script + html;
     }
 
     private Release fetchLatestRelease() throws Exception {
