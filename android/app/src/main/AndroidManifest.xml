@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false">
         <activity
-            android:name=".MainActivityV13"
+            android:name=".MainActivityV14"
             android:exported="true"
             android:label="E-conomic"
             android:screenOrientation="unspecified">
