@@ -4,8 +4,8 @@
 
 La interfaz activa 2.0 se recuperó de `app_releases` y se verificó su SHA-256 antes de modificarla. `web/` contiene ahora la fuente editable común; `python3 scripts/build_frontend.py` genera `dist/` para web, el HTML autónomo incluido en Android y el candidato OTA de `release/`. No necesita nuevas tablas ni migraciones. Las políticas RLS y los cierres existentes siguen siendo la autoridad al sincronizar.
 
-- Android: 2.1.1, versionCode 10. Las notificaciones resuelven la actividad de inicio vigente para pasar por el bloqueo biométrico.
-- Candidato frontend: 2.1.0, version_code 11.
+- Android: 2.1.2, versionCode 11. Incluye la interfaz responsive móvil y mantiene las notificaciones detrás del bloqueo biométrico.
+- Candidato frontend: 2.1.2, version_code 12.
 - La publicación del APK usa el workflow existente y su firma persistente. Un PR compila sin firmar ni publicar. Solo main publica.
 - El panel usa las cuentas Supabase existentes. Sites comienza con acceso privado del propietario; compartir el enlace con otro usuario requiere configurar su audiencia.
 
