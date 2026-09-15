@@ -2,6 +2,7 @@ name: Build Android APK
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     branches: [ main ]
 
@@ -34,13 +35,14 @@ jobs:
           gradle-version: '9.6.0'
 
       - name: Rebuild packaged frontend
-        run: cat android/app/src/main/assets/html_*.b64 | base64 --decode > android/app/src/main/assets/index.html
+        run: python3 scripts/build_frontend.py
 
       - name: Build release APK
         working-directory: android
         run: gradle assembleRelease --stacktrace
 
       - name: Sign APK with permanent key
+        if: github.event_name != 'pull_request'
         shell: bash
         env:
           ECONOMIC_KEYSTORE_B64: ${{ secrets.ECONOMIC_KEYSTORE_B64 }}
@@ -63,6 +65,7 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$SIGNED"
 
       - name: Request GitHub OIDC token
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
@@ -71,6 +74,7 @@ jobs:
           echo "OIDC_TOKEN=$OIDC_TOKEN" >> "$GITHUB_ENV"
 
       - name: Publish signed APK to E-conomic updater
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
@@ -90,6 +94,7 @@ jobs:
           test "$(jq -r '.ok' /tmp/publish.json)" = "true"
 
       - name: Upload signed APK artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: E-conomic-signed

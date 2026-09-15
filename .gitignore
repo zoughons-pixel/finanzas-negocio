@@ -1,0 +1,6 @@
+.sites-runtime/
+android/.gradle/
+android/app/build/
+android/local.properties
+node_modules/
+test-results/
