@@ -50,6 +50,7 @@ test('saved session and cached business reopen offline and a new movement stays 
   assert.equal(first.window.document.getElementById('businessName').textContent,'Test business');
   const storage={};for(let i=0;i<first.window.localStorage.length;i++){const k=first.window.localStorage.key(i);storage[k]=first.window.localStorage.getItem(k)}
   first.window.close();online=false;
+  const expired=JSON.parse(storage['sb-chfrcfaldbdhmtgtoxcm-auth-token']);expired.expires_at=1;storage['sb-chfrcfaldbdhmtgtoxcm-auth-token']=JSON.stringify(expired);
   const second=run(storage);await new Promise(r=>setTimeout(r,500));
   const w=second.window,d=w.document;
   assert.equal(d.getElementById('appScreen').classList.contains('hidden'),false);

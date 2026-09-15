@@ -306,6 +306,15 @@ async function initSupabase(){
   sb=window.supabase.createClient(cfg.url.replace(/\/$/,''),cfg.key,{global:{fetch:window.EconOffline.fetch},auth:{persistSession:true,autoRefreshToken:navigator.onLine,detectSessionInUrl:false}});
   let data,error;
   const saved=JSON.parse(localStorage.getItem('economic-offline-user')||'null');
+  const onlineGetSession=sb.auth.getSession.bind(sb.auth);
+  sb.auth.getSession=()=>{
+    const identity=JSON.parse(localStorage.getItem('economic-offline-user')||'null');
+    if(!navigator.onLine&&identity?.url===cfg.url){
+      // Local-only identity unlocks cached reads; this token is never valid on the server.
+      return Promise.resolve({data:{session:{user:identity.user,access_token:'offline-local'}},error:null});
+    }
+    return onlineGetSession();
+  };
   if(!navigator.onLine&&saved?.url===cfg.url){data={session:{user:saved.user}};}
   else {({data,error}=await sb.auth.getSession());}
   if(error)msg('authError',error.message);
