@@ -1,0 +1,151 @@
+/* Mobile layout is loaded after the feature styles so every app section follows
+   the same responsive rules, including sections added by later releases. */
+@media (max-width:760px){
+  html,body{max-width:100%;overflow-x:hidden}
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  #appScreen{padding-bottom:0}
+  #appScreen>header{position:sticky;top:0;z-index:45;margin:0;width:100%;padding:calc(8px + env(safe-area-inset-top)) 10px 8px}
+  #appScreen>.container{margin:0;width:100%;padding:10px}
+  .header-inner{padding:0;gap:8px}
+  .header-title h1{font-size:16px}
+  .header-title p{max-width:42vw;margin-top:2px;font-size:10px}
+  .header-actions{gap:5px;flex-shrink:0}
+  .icon-btn{width:40px;height:40px;border-radius:12px}
+  .sync-pill{width:32px;height:32px;padding:0;justify-content:center}
+  .sync-pill span:last-child{display:none}
+
+  .panel-nav{position:fixed;inset:auto 0 0 0;top:auto;width:100%;height:calc(66px + env(safe-area-inset-bottom));padding:5px 7px env(safe-area-inset-bottom);display:flex;flex-direction:row;align-items:stretch;gap:2px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x proximity;background:color-mix(in srgb,#080f20 96%,transparent);border:0;border-top:1px solid #28334b;box-shadow:0 -8px 28px rgba(0,0,0,.22);z-index:250;scrollbar-width:none}
+  .panel-nav::-webkit-scrollbar{display:none}
+  .panel-brand{display:none}
+  .panel-nav button{flex:0 0 70px;min-width:70px;height:56px;padding:5px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;white-space:normal;border-radius:12px;color:#9eacc6;scroll-snap-align:center}
+  .panel-nav button.active{background:#284bcc;color:#fff}
+  .panel-nav-icon{font-size:20px;line-height:1}
+  .panel-nav-label{font-size:9px;font-weight:800;line-height:1.1;max-width:68px;overflow:hidden;text-overflow:ellipsis}
+
+  .panel-pages,.panel-page,.panel-movements,.panel-movements>.card,.card>*{min-width:0}
+  .panel-heading{font-size:21px;line-height:1.2;letter-spacing:-.35px;margin:12px 2px 11px}
+  .card{padding:14px;margin-bottom:10px;border-radius:15px;box-shadow:0 7px 22px rgba(20,30,60,.07)}
+  .card h2{font-size:16px;line-height:1.25}
+  .muted{line-height:1.4}
+  .section-head{align-items:flex-start;flex-wrap:wrap}
+  .section-head>.btn{margin-left:auto}
+  input,select,textarea{min-height:48px;font-size:16px}
+  textarea{min-height:96px}
+  .form-row{grid-template-columns:1fr!important;gap:0}
+  .form-group{margin-bottom:12px}
+  .btn{min-height:44px}
+  .actions{width:100%}
+  .actions>.btn{flex:1 1 120px}
+
+  .offline-banner{margin:0 0 10px;padding:12px;gap:10px;border-radius:14px;align-items:stretch}
+  .offline-banner strong{font-size:13px}
+  .offline-banner p{font-size:11px;line-height:1.4}
+  .offline-banner .actions{display:grid;grid-template-columns:1fr 1fr}
+  .offline-banner .btn{width:100%;padding-inline:8px}
+  .queue-card{margin-bottom:10px}
+  .queue-item{gap:10px}
+  .queue-item .btn{width:100%}
+
+  .stats{grid-template-columns:1fr 1fr!important;gap:8px;margin-bottom:10px}
+  .stats .stat:first-child{grid-column:1/-1}
+  .stat{padding:12px;border-radius:14px}
+  .stat-title{margin-bottom:5px}
+  .stat-main{font-size:21px;line-height:1.15;overflow-wrap:anywhere}
+  .stat-sub{font-size:10px;margin-top:3px;overflow-wrap:anywhere}
+  .rates{grid-template-columns:1fr 1fr!important;gap:8px}
+  .rate{padding:11px}
+  .rate-top{align-items:flex-start;flex-direction:column;gap:5px}
+  .rate-value{font-size:18px;overflow-wrap:anywhere}
+  .preview{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px}
+  .preview>div{padding:8px 6px}
+  .preview strong{font-size:10px;overflow-wrap:anywhere}
+
+  .filters{grid-template-columns:1fr 1fr!important;gap:7px}
+  .filters #search{grid-column:1/-1}
+  .v12-quick-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .v12-quick-filters .btn{width:100%;padding-inline:6px}
+  .tx{padding:11px}
+  .tx-top{gap:8px}
+  .tx-title,.tx-desc,.activity-title,.activity-change,.v15-account-name,.v15-account-sub,.v20-name,.v20-sub{overflow-wrap:anywhere}
+  .tx-values{grid-template-columns:1fr 1fr!important;gap:6px}
+  .tx-val{padding:7px}
+  .tx-val strong{font-size:12px;overflow-wrap:anywhere}
+  .tx-meta{gap:4px}
+  .activity-item{grid-template-columns:34px minmax(0,1fr);padding:10px}
+  .activity-icon{width:34px;height:34px}
+  .category-add{grid-template-columns:minmax(0,1fr) 48px}
+  .join-code{font-size:15px;overflow-wrap:anywhere}
+
+  .v12-dashboard{overflow:visible}
+  .v12-dash-head{gap:9px;margin-bottom:10px}
+  .v12-month-nav{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;width:100%;gap:6px}
+  .v12-month-nav input{min-width:0;width:100%}
+  .v12-kpis{grid-template-columns:1fr 1fr!important;gap:7px}
+  .v12-kpi{padding:10px}
+  .v12-kpi-value{font-size:17px;overflow-wrap:anywhere}
+  .v12-dashboard-grid{grid-template-columns:1fr!important;gap:8px}
+  .v12-panel{padding:10px}
+  .v12-trend{overflow-x:auto;overscroll-behavior-x:contain}
+  .v12-trend-list{min-width:430px}
+
+  .v13-file-actions{display:grid;grid-template-columns:1fr 1fr}
+  .v13-file-actions .btn{width:100%;padding-inline:7px}
+  .v13-file-row{align-items:flex-start;flex-direction:column}
+  .v13-file-row .btn{width:100%}
+  .v13-receipt-grid{grid-template-columns:1fr!important}
+
+  .v14-toolbar,.v14-toolbar-left{width:100%}
+  .v14-summary{grid-template-columns:1fr 1fr!important;gap:7px}
+  .v14-metric{padding:10px}
+  .v14-summary .v14-metric:last-child:nth-child(odd){grid-column:1/-1}
+  .v14-history-row{grid-template-columns:minmax(0,1fr) auto!important}
+
+  .v15-kpis,.v16-kpis,.v20-kpis{grid-template-columns:1fr 1fr!important;gap:7px}
+  .v15-kpi,.v16-kpi,.v20-kpi{padding:10px}
+  .v15-kpi strong,.v16-kpi strong,.v20-kpi strong{font-size:16px;overflow-wrap:anywhere}
+  .v15-filters{grid-template-columns:1fr!important}
+  .v15-values,.v20-values{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px}
+  .v15-val,.v20-value{padding:7px 5px}
+  .v15-val strong,.v20-value strong{overflow-wrap:anywhere}
+  .v15-account-top,.v15-account-foot{gap:7px}
+  .v15-detail-grid{grid-template-columns:1fr 1fr!important}
+  .v15-payment{align-items:flex-start;flex-direction:column}
+  .v15-payment .btn{width:100%}
+
+  .v16-headrow{margin-top:15px;gap:8px}
+  .v16-headrow .actions{display:grid;grid-template-columns:minmax(0,1fr) auto}
+  .v16-budget-grid,.v16-goal-grid{grid-template-columns:1fr!important}
+  .v16-cash-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px}
+  .v16-cash{padding:9px 7px}
+  .v16-cash strong{font-size:13px;overflow-wrap:anywhere}
+  .v16-cash small{font-size:8px}
+  .v16-row{align-items:flex-start}
+
+  .v20-grid{grid-template-columns:1fr!important;gap:14px}
+  .v20-top>.actions{display:grid;grid-template-columns:1fr 1fr}
+  .v20-item{padding:10px}
+
+  .v13-modal,.v15-modal,.v16-modal,.v20-modal{align-items:flex-end!important;padding:0!important}
+  .v13-modal-card,.v15-modal-card,.v16-modal-card,.v20-modal-card{width:100%!important;max-width:none!important;max-height:calc(100dvh - env(safe-area-inset-top) - 10px)!important;margin:0;border-radius:20px 20px 0 0!important;padding:16px 14px calc(16px + env(safe-area-inset-bottom))!important;overscroll-behavior:contain}
+  .v13-modal-head,.v15-modal-head,.v16-modal-head,.v20-modal-head{position:sticky;top:-16px;z-index:2;background:var(--card);padding:16px 0 9px;margin-top:-16px}
+  .v13-modal-head h2,.v15-modal-head h2,.v16-modal-head h2,.v20-modal-head h2{font-size:17px;line-height:1.2}
+  .toast{bottom:calc(78px + env(safe-area-inset-bottom));z-index:300}
+  .footer{padding-bottom:8px}
+}
+
+@media (max-width:370px){
+  #appScreen>.container{padding:8px}
+  .card{padding:12px}
+  .rates{grid-template-columns:1fr!important}
+  .v12-kpis,.v15-kpis,.v16-kpis,.v20-kpis{grid-template-columns:1fr!important}
+  .v16-cash-grid{grid-template-columns:1fr!important}
+  .v15-values,.v20-values{grid-template-columns:1fr 1fr!important}
+  .panel-nav button{flex-basis:66px;min-width:66px}
+}
+
+@media (max-width:760px) and (orientation:landscape){
+  .panel-nav{height:calc(58px + env(safe-area-inset-bottom))}
+  .panel-nav button{height:48px}
+  .panel-nav-icon{font-size:17px}
+  body{padding-bottom:calc(68px + env(safe-area-inset-bottom))}
+}

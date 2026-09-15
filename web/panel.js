@@ -6,16 +6,26 @@
   nav.innerHTML = '<div class="panel-brand"><b>E-conomic</b><span>Control del negocio</span></div>';
   const pageRoot = document.createElement('div'); pageRoot.className = 'panel-pages';
   const pages = new Map(); let active = 'Resumen';
+  const navMeta = {
+    'Resumen':['⌂','Inicio'],
+    'Movimientos':['↕','Movimientos'],
+    'Clientes y proyectos':['♙','Clientes'],
+    'Cobros y pagos':['◷','Cuentas'],
+    'Planificación':['◎','Planes'],
+    'Reportes y cierres':['▤','Reportes'],
+    'Actividad':['◉','Actividad'],
+    'Ajustes':['⚙','Ajustes']
+  };
   function page(name, elements) {
     const section = document.createElement('section'); section.className = 'panel-page';
     const heading=document.createElement('h2');heading.className='panel-heading';heading.textContent=name;section.append(heading);
     elements.filter(Boolean).forEach(el=>section.append(el));pageRoot.append(section);pages.set(name,section);
-    const button=document.createElement('button');button.type='button';button.textContent=name;button.onclick=()=>select(name);nav.append(button);
+    const button=document.createElement('button'),meta=navMeta[name]||['•',name];button.type='button';button.dataset.page=name;button.setAttribute('aria-label',name);button.innerHTML=`<span class="panel-nav-icon" aria-hidden="true">${meta[0]}</span><span class="panel-nav-label">${meta[1]}</span>`;button.onclick=()=>select(name);nav.append(button);
   }
   function select(name) {
     active=name;
     pages.forEach((section,key)=>section.hidden=key!==name);
-    nav.querySelectorAll('button').forEach(btn=>{btn.classList.toggle('active',btn.textContent===name);btn.setAttribute('aria-current',btn.textContent===name?'page':'false')});
+    nav.querySelectorAll('button').forEach(btn=>{const current=btn.dataset.page===name;btn.classList.toggle('active',current);btn.setAttribute('aria-current',current?'page':'false');if(current&&matchMedia('(max-width:760px)').matches)btn.scrollIntoView({inline:'center',block:'nearest'})});
     scrollTo({top:0,behavior:'smooth'});
   }
   const cardFor = id => $(id)?.closest('.card');
@@ -32,7 +42,7 @@
   page('Ajustes',[security,cardFor('categoryChips'),cardFor('joinCodeView')]);
   document.querySelector('#appScreen .grid')?.remove();
   container.append(pageRoot);$('appScreen').prepend(nav);
-  const footer=document.querySelector('.footer');if(footer){footer.textContent='E-conomic 2.1 · Finanzas del negocio';container.append(footer)}
+  const footer=document.querySelector('.footer');if(footer){footer.textContent='E-conomic 2.1.2 · Finanzas del negocio';container.append(footer)}
   const banner=document.createElement('section');banner.className='offline-banner';banner.setAttribute('aria-live','polite');
   banner.innerHTML='<div><strong id="offlineState">Conectando…</strong><p id="offlineDetail"></p></div><div class="actions"><button type="button" class="btn btn-secondary" id="offlineSync">Sincronizar</button><button type="button" class="btn btn-primary" id="quickMovement">+ Movimiento</button></div>';
   container.prepend(banner);
