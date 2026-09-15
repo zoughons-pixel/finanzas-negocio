@@ -105,8 +105,9 @@ public class FinanceAlertReceiver extends BroadcastReceiver {
         key = safeKey(key);
         title = safeText(title, 120, "E-conomic");
         body = safeText(body, 500, "Tienes una alerta financiera.");
-        Intent launch = new Intent(context, MainActivityV16.class)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        Intent launch = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+        if (launch == null) return;
+        launch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent content = PendingIntent.getActivity(
                 context,
                 requestCode("open:" + key),
