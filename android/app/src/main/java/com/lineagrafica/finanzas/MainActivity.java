@@ -32,11 +32,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Locale;
 
-public class MainActivity extends Activity {
+public class MainActivity extends androidx.fragment.app.FragmentActivity {
     private static final String SUPABASE_URL = "https://chfrcfaldbdhmtgtoxcm.supabase.co";
     private static final String SUPABASE_PUBLISHABLE_KEY = "sb_publishable_1OVPFyUhEuvFsLu-n4c_kA_h8xZfJhM";
     private static final String APP_ORIGIN = "https://app.lineagrafica.local/";
-    private static final int BUNDLED_FRONTEND_VERSION = 1;
+    private static final int BUNDLED_FRONTEND_VERSION = 11;
     private static final String PREFS = "ota_frontend";
     private static final String PREF_VERSION = "version_code";
     private static final String PREF_SHA = "sha256";
@@ -76,7 +76,16 @@ public class MainActivity extends Activity {
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest request) {
+                Uri uri = request.getUrl();
+                if (APP_ORIGIN.equals(uri.getScheme() + "://" + uri.getHost() + "/")) return false;
+                if (request.isForMainFrame() && ("https".equals(uri.getScheme()) || "mailto".equals(uri.getScheme()) || "tel".equals(uri.getScheme()))) {
+                    try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); } catch (Exception ignored) { }
+                }
+                return true;
+            }
+        });
         webView.setWebChromeClient(new WebChromeClient());
     }
 
@@ -85,7 +94,7 @@ public class MainActivity extends Activity {
         String cached = readValidCachedFrontend();
         int cachedVersion = getSharedPreferences(PREFS, MODE_PRIVATE).getInt(PREF_VERSION, BUNDLED_FRONTEND_VERSION);
         String current = cached != null && cachedVersion >= BUNDLED_FRONTEND_VERSION ? cached : bundled;
-        int currentVersion = cached != null ? cachedVersion : BUNDLED_FRONTEND_VERSION;
+        int currentVersion = cached != null ? Math.max(cachedVersion, BUNDLED_FRONTEND_VERSION) : BUNDLED_FRONTEND_VERSION;
 
         try {
             Release latest = fetchLatestRelease();

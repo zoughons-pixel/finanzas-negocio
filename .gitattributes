@@ -1,0 +1,5 @@
+# Vendored/minified JavaScript contains intentional whitespace in template literals.
+web/vendor/** whitespace=-blank-at-eol
+dist/vendor/** whitespace=-blank-at-eol
+android/app/src/main/assets/index.html whitespace=-blank-at-eol
+release/*.html whitespace=-blank-at-eol
